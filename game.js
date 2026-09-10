@@ -72,7 +72,42 @@
       this.vy += 1750 * dt; const oldY = this.y; this.x += this.vx * dt; this.y += this.vy * dt; this.grounded = false; game.level.platforms.forEach(p => { if (this.x + this.w > p.x && this.x < p.x + p.w && oldY + this.h <= p.y + 4 && this.y + this.h >= p.y && this.vy >= 0) { this.y = p.y - this.h; this.vy = 0; this.grounded = true; this.squash = 1.16; } }); this.x = clamp(this.x, 0, game.level.width - this.w); this.squash += (1 - this.squash) * dt * 9; if (this.y > H + 120) game.damage(true);
     }
     jump() { this.jumpBuffer = .13; }
-    draw(g, camera) { if (this.invuln > 0 && Math.floor(this.invuln * 14) % 2 === 0) return; const x = this.x - camera.x, y = this.y - camera.y, run = Math.sin(performance.now() / 85) * Math.min(4, Math.abs(this.vx) / 50); g.save(); g.translate(x + this.w / 2, y + this.h); g.scale(this.facing, this.squash); g.fillStyle = '#173d36'; g.fillRect(-12, -8, 9, 8); g.fillRect(4, -8, 9, 8); g.fillStyle = '#ef6f55'; roundedRect(g, -15, -53, 30, 40, 9); g.fill(); g.fillStyle = '#f2ad70'; g.beginPath(); g.arc(0, -62, 17, 0, Math.PI * 2); g.fill(); g.fillStyle = '#1a5145'; g.beginPath(); g.arc(0, -68, 18, Math.PI, Math.PI * 2); g.fill(); g.fillStyle = '#173d36'; g.fillRect(-7, -64, 4, 5); g.fillRect(4, -64, 4, 5); g.fillStyle = '#f6c453'; g.fillRect(-15, -45 + run, 30, 7); if (this.shield) { g.strokeStyle = '#70e1d1'; g.lineWidth = 3; g.globalAlpha = .7; g.beginPath(); g.arc(0, -34, 30, 0, Math.PI * 2); g.stroke(); } g.restore(); }
+    draw(g, camera) {
+      const x = this.x - camera.x;
+      const y = this.y - camera.y;
+      const run = Math.sin(performance.now() / 85) * Math.min(4, Math.abs(this.vx) / 50);
+      g.save();
+      g.globalAlpha = 1;
+      g.translate(x + this.w / 2, y + this.h);
+      g.fillStyle = '#173d36';
+      g.fillRect(-12, -8, 9, 8);
+      g.fillRect(4, -8, 9, 8);
+      g.fillStyle = '#ef6f55';
+      roundedRect(g, -15, -53, 30, 40, 9);
+      g.fill();
+      g.fillStyle = '#f2ad70';
+      g.beginPath();
+      g.arc(0, -62, 17, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = '#1a5145';
+      g.beginPath();
+      g.arc(0, -68, 18, Math.PI, Math.PI * 2);
+      g.fill();
+      g.fillStyle = '#173d36';
+      g.fillRect(-7, -64, 4, 5);
+      g.fillRect(4, -64, 4, 5);
+      g.fillStyle = '#f6c453';
+      g.fillRect(-15, -45 + run, 30, 7);
+      if (this.shield) {
+        g.strokeStyle = '#70e1d1';
+        g.lineWidth = 3;
+        g.globalAlpha = .7;
+        g.beginPath();
+        g.arc(0, -34, 30, 0, Math.PI * 2);
+        g.stroke();
+      }
+      g.restore();
+    }
   }
 
   class Camera { constructor() { this.x = 0; this.shake = 0; } update(dt, player, level) { const target = clamp(player.x - W * .42, 0, level.width - W); this.x += (target - this.x) * Math.min(1, dt * 5); this.shake = Math.max(0, this.shake - dt); } }
