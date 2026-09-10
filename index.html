@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jungle Dash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-shell">
+    <canvas id="gameCanvas" aria-label="Jungle Dash game"></canvas>
+    <div id="hud" class="hud hidden">
+      <div class="hud-group hearts" id="hearts" aria-label="Health"></div>
+      <div class="hud-stat"><span class="icon coin-icon">●</span><span id="coinCount">000</span></div>
+      <div class="hud-stat"><span class="icon gem-icon">◆</span><span id="gemCount">0</span></div>
+      <div class="hud-stat score-stat"><span>SCORE</span><b id="score">0000</b></div>
+      <div class="hud-stat time-stat"><span>TIME</span><b id="timer">00:00</b></div>
+      <button id="pauseButton" class="icon-button" aria-label="Pause game" title="Pause game">Ⅱ</button>
+    </div>
+    <div id="toast" class="toast"></div>
+    <section id="menuScreen" class="screen menu-screen">
+      <div class="menu-copy">
+        <p class="eyebrow">EXPLORE • COLLECT • DASH</p>
+        <h1>Jungle<br><em>Dash</em></h1>
+        <p class="tagline">A wild little run through the emerald canopy.</p>
+        <div class="menu-actions">
+          <button class="primary-button" data-action="play">Play Game <span>→</span></button>
+          <div class="secondary-actions">
+            <button class="text-button" data-action="character">Character</button>
+            <button class="text-button" data-action="levels">Levels</button>
+            <button class="text-button" data-action="settings">Settings</button>
+          </div>
+        </div>
+      </div>
+      <div class="menu-art" aria-hidden="true">
+        <div class="sun-disc"></div><div class="leaf leaf-one"></div><div class="leaf leaf-two"></div>
+        <div class="menu-vine"></div><div class="menu-platform"></div>
+        <div class="menu-hero"><div class="hero-hair"></div><div class="hero-face"><i></i><i></i></div><div class="hero-body"></div><div class="hero-scarf"></div></div>
+        <div class="menu-coin">●</div><div class="menu-gem">◆</div>
+      </div>
+    </section>
+    <section id="pauseScreen" class="screen modal-screen hidden"><div class="modal-card"><p class="eyebrow">JUNGLE PAUSED</p><h2>Take a breath.</h2><button class="primary-button" data-action="resume">Resume <span>→</span></button><button class="outline-button" data-action="restart">Restart level</button><button class="outline-button" data-action="menu">Main menu</button></div></section>
+    <section id="gameOverScreen" class="screen modal-screen hidden"><div class="modal-card"><p class="eyebrow">THE JUNGLE WINS</p><h2>Game Over</h2><p class="modal-note">The trail is still there. Try a different route.</p><button class="primary-button" data-action="restart">Restart level <span>↻</span></button><button class="outline-button" data-action="menu">Main menu</button></div></section>
+    <section id="completeScreen" class="screen modal-screen hidden"><div class="modal-card complete-card"><p class="eyebrow">TRAIL COMPLETE</p><h2>Level Complete!</h2><div class="results"><div><span>Score</span><b id="finalScore">0</b></div><div><span>Coins</span><b id="finalCoins">0</b></div><div><span>Gems</span><b id="finalGems">0</b></div><div><span>Time</span><b id="finalTime">00:00</b></div></div><button class="primary-button" data-action="next">Next level <span>→</span></button><button class="outline-button" data-action="restart">Replay</button><button class="outline-button" data-action="menu">Main menu</button></div></section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
