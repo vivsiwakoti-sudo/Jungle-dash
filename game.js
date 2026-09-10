@@ -12,6 +12,16 @@
   const overlap = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
   const rnd = (min, max) => min + Math.random() * (max - min);
+  const roundedRect = (g, x, y, w, h, radius) => {
+    const r = Math.min(radius, w / 2, h / 2);
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  };
 
   class ParticleSystem {
     constructor() { this.items = []; }
@@ -41,7 +51,7 @@
   class Enemy {
     constructor(x, y, kind = 'slime') { Object.assign(this, { x, y, kind, w: kind === 'bug' ? 34 : 42, h: kind === 'bug' ? 25 : 30, vx: kind === 'bug' ? 55 : 48, startY: y, phase: rnd(0, 6), alive: true, direction: 1 }); }
     update(dt, level) { if (!this.alive) return; this.phase += dt * 3; if (this.kind === 'bug') { this.x += this.vx * this.direction * dt; this.y = this.startY + Math.sin(this.phase) * 25; if (this.x < 520 || this.x > 2100) this.direction *= -1; return; } this.x += this.vx * this.direction * dt; const ground = level.platforms.find(p => this.x + this.w > p.x && this.x < p.x + p.w && Math.abs(this.y + this.h - p.y) < 8); if (!ground || this.x < ground.x || this.x + this.w > ground.x + ground.w) this.direction *= -1; }
-    draw(g, camera) { if (!this.alive) return; const x = this.x - camera.x, y = this.y - camera.y + Math.sin(this.phase) * 2; g.save(); g.fillStyle = this.kind === 'bug' ? '#ba72ce' : '#ed7659'; g.beginPath(); if (this.kind === 'bug') { g.ellipse(x + 17, y + 13, 17, 10, 0, 0, Math.PI * 2); g.fillStyle = '#f2b9e9'; g.ellipse(x + 4, y + 7, 10, 7, -.3, 0, Math.PI * 2); g.ellipse(x + 30, y + 7, 10, 7, .3, 0, Math.PI * 2); } else { g.roundRect(x, y + 5, this.w, this.h - 5, 13); } g.fill(); g.fillStyle = '#173d36'; g.fillRect(x + 10, y + 12, 4, 6); g.fillRect(x + this.w - 14, y + 12, 4, 6); g.restore(); }
+    draw(g, camera) { if (!this.alive) return; const x = this.x - camera.x, y = this.y - camera.y + Math.sin(this.phase) * 2; g.save(); g.fillStyle = this.kind === 'bug' ? '#ba72ce' : '#ed7659'; g.beginPath(); if (this.kind === 'bug') { g.ellipse(x + 17, y + 13, 17, 10, 0, 0, Math.PI * 2); g.fillStyle = '#f2b9e9'; g.ellipse(x + 4, y + 7, 10, 7, -.3, 0, Math.PI * 2); g.ellipse(x + 30, y + 7, 10, 7, .3, 0, Math.PI * 2); } else { roundedRect(g, x, y + 5, this.w, this.h - 5, 13); } g.fill(); g.fillStyle = '#173d36'; g.fillRect(x + 10, y + 12, 4, 6); g.fillRect(x + this.w - 14, y + 12, 4, 6); g.restore(); }
   }
 
   class Player {
@@ -62,7 +72,7 @@
       this.vy += 1750 * dt; const oldY = this.y; this.x += this.vx * dt; this.y += this.vy * dt; this.grounded = false; game.level.platforms.forEach(p => { if (this.x + this.w > p.x && this.x < p.x + p.w && oldY + this.h <= p.y + 4 && this.y + this.h >= p.y && this.vy >= 0) { this.y = p.y - this.h; this.vy = 0; this.grounded = true; this.squash = 1.16; } }); this.x = clamp(this.x, 0, game.level.width - this.w); this.squash += (1 - this.squash) * dt * 9; if (this.y > H + 120) game.damage(true);
     }
     jump() { this.jumpBuffer = .13; }
-    draw(g, camera) { if (this.invuln > 0 && Math.floor(this.invuln * 14) % 2 === 0) return; const x = this.x - camera.x, y = this.y - camera.y, run = Math.sin(performance.now() / 85) * Math.min(4, Math.abs(this.vx) / 50); g.save(); g.translate(x + this.w / 2, y + this.h); g.scale(this.facing, this.squash); g.fillStyle = '#173d36'; g.fillRect(-12, -8, 9, 8); g.fillRect(4, -8, 9, 8); g.fillStyle = '#ef6f55'; g.beginPath(); g.roundRect(-15, -53, 30, 40, 9); g.fill(); g.fillStyle = '#f2ad70'; g.beginPath(); g.arc(0, -62, 17, 0, Math.PI * 2); g.fill(); g.fillStyle = '#1a5145'; g.beginPath(); g.arc(0, -68, 18, Math.PI, Math.PI * 2); g.fill(); g.fillStyle = '#173d36'; g.fillRect(-7, -64, 4, 5); g.fillRect(4, -64, 4, 5); g.fillStyle = '#f6c453'; g.fillRect(-15, -45 + run, 30, 7); if (this.shield) { g.strokeStyle = '#70e1d1'; g.lineWidth = 3; g.globalAlpha = .7; g.beginPath(); g.arc(0, -34, 30, 0, Math.PI * 2); g.stroke(); } g.restore(); }
+    draw(g, camera) { if (this.invuln > 0 && Math.floor(this.invuln * 14) % 2 === 0) return; const x = this.x - camera.x, y = this.y - camera.y, run = Math.sin(performance.now() / 85) * Math.min(4, Math.abs(this.vx) / 50); g.save(); g.translate(x + this.w / 2, y + this.h); g.scale(this.facing, this.squash); g.fillStyle = '#173d36'; g.fillRect(-12, -8, 9, 8); g.fillRect(4, -8, 9, 8); g.fillStyle = '#ef6f55'; roundedRect(g, -15, -53, 30, 40, 9); g.fill(); g.fillStyle = '#f2ad70'; g.beginPath(); g.arc(0, -62, 17, 0, Math.PI * 2); g.fill(); g.fillStyle = '#1a5145'; g.beginPath(); g.arc(0, -68, 18, Math.PI, Math.PI * 2); g.fill(); g.fillStyle = '#173d36'; g.fillRect(-7, -64, 4, 5); g.fillRect(4, -64, 4, 5); g.fillStyle = '#f6c453'; g.fillRect(-15, -45 + run, 30, 7); if (this.shield) { g.strokeStyle = '#70e1d1'; g.lineWidth = 3; g.globalAlpha = .7; g.beginPath(); g.arc(0, -34, 30, 0, Math.PI * 2); g.stroke(); } g.restore(); }
   }
 
   class Camera { constructor() { this.x = 0; this.shake = 0; } update(dt, player, level) { const target = clamp(player.x - W * .42, 0, level.width - W); this.x += (target - this.x) * Math.min(1, dt * 5); this.shake = Math.max(0, this.shake - dt); } }
